@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tech & AI Master Quiz</title>
+  
+  <!-- Manifest & Meta PWA agar dapat dipasang sebagai APK/Web App -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0d1117">
+  
+  <!-- Font & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+    }
+    body {
+      background: linear-gradient(135deg, #0d1117, #161b22, #002b36);
+      color: #e6edf3;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 15px;
+    }
+    .app-container {
+      width: 100%;
+      max-width: 500px;
+      background: rgba(22, 27, 34, 0.85);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .screen {
+      display: none;
+      animation: fadeIn 0.4s ease-in-out forwards;
+    }
+    .screen.active {
+      display: block;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Header / Home */
+    .brand {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .brand i {
+      font-size: 50px;
+      color: #58a6ff;
+      margin-bottom: 10px;
+    }
+    .brand h1 {
+      font-size: 24px;
+      color: #ffffff;
+    }
+    .brand p {
+      font-size: 14px;
+      color: #8b949e;
+      margin-top: 5px;
+    }
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #238636, #2ea043);
+      color: white;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 12px;
+      transition: all 0.2s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(46, 160, 67, 0.4);
+    }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: #c9d1d9;
+    }
+
+    /* Quiz Screen */
+    .quiz-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .progress-bar-bg {
+      width: 100%;
+      height: 8px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #58a6ff, #bc8cff);
+      transition: width 0.3s ease;
+    }
+    .question-text {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    .options-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .option-btn {
+      padding: 12px 16px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #c9d1d9;
+      text-align: left;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .option-btn:hover {
+      background: rgba(88, 166, 255, 0.15);
+      border-color: #58a6ff;
+    }
+    .option-btn.selected {
+      background: #1f6beb;
+      color: white;
+      border-color: #58a6ff;
+    }
+    .nav-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    /* Result Screen */
+    .result-box {
+      text-align: center;
+      padding: 20px 0;
+    }
+    .score-circle {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1f6beb, #238636);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 28px;
+      font-weight: 700;
+      margin: 0 auto 20px auto;
+      box-shadow: 0 0 20px rgba(31, 107, 235, 0.5);
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 20px 0;
+    }
+    .stat-card {
+      background: rgba(255,255,255,0.05);
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+    .stat-card span {
+      display: block;
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Home Screen -->
+    <div id="home-screen" class="screen active">
+      <div class="brand">
+        <i class="fa-solid fa-microchip"></i>
+        <h1>Tech & AI Master</h1>
+        <p>Uji Pengetahuan Teknologi & Kecerdasan Buatan (45 Soal)</p>
+      </div>
+      <button class="btn" onclick="startQuiz()">
+        <i class="fa-solid fa-play"></i> Mulai Kuis
+      </button>
+      <button class="btn btn-secondary" onclick="alert('Buka menu Chrome/Safari -> Tambahkan ke Layar Utama untuk menjadikan Apk di HP!')">
+        <i class="fa-solid fa-mobile-screen"></i> Pasang Sebagai APK
+      </button>
+    </div>
+
+    <!-- Quiz Screen -->
+    <div id="quiz-screen" class="screen">
+      <div class="quiz-header">
+        <span id="question-count" style="font-size: 14px; color: #8b949e;">Soal 1 / 45</span>
+        <span id="score-live" style="font-size: 14px; color: #58a6ff; font-weight: 600;">Skor: 0</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div id="progress-bar" class="progress-bar-fill"></div>
+      </div>
+      <div id="question-text" class="question-text">Loading Soal...</div>
+      <div id="options-container" class="options-container"></div>
+      <div class="nav-buttons">
+        <button id="prev-btn" class="btn btn-secondary" onclick="prevQuestion()" style="display:none;">Sebelumnya</button>
+        <button id="next-btn" class="btn" onclick="nextQuestion()">Selanjutnya</button>
+      </div>
+    </div>
+
+    <!-- Result Screen -->
+    <div id="result-screen" class="screen">
+      <div class="result-box">
+        <div id="score-circle" class="score-circle">0%</div>
+        <h2>Kuis Selesai!</h2>
+        <div class="stats-grid">
+          <div class="stat-card">Benar <span id="correct-count" style="color: #3fb950;">0</span></div>
+          <div class="stat-card">Salah <span id="wrong-count" style="color: #f85149;">0</span></div>
+        </div>
+        <button class="btn" onclick="startQuiz()">
+          <i class="fa-solid fa-rotate-right"></i> Coba Lagi
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const questions = [
+      { q: "1. Apa kepanjangan dari AI?", o: ["Artificial Intelligence", "Automated Information", "Advanced Integration", "Automatic Internet"], a: 0 },
+      { q: "2. Bahasa pemrograman yang paling populer dalam pengembang AI & Machine Learning adalah...", o: ["Python", "HTML", "PHP", "CSS"], a: 0 },
+      { q: "3. Model AI ciptaan OpenAI yang terkenal untuk pemrosesan bahasa alami adalah...", o: ["ChatGPT", "Midjourney", "DALL-E", "Sora"], a: 0 },
+      { q: "4. Komponen fisik pada komputer disebut...", o: ["Hardware", "Software", "Brainware", "Firmware"], a: 0 },
+      { q: "5. Otak dari sebuah komputer yang memproses data adalah...", o: ["CPU", "RAM", "Harddisk", "GPU"], a: 0 },
+      { q: "6. Tempat penyimpanan sementara saat komputer menyala adalah...", o: ["RAM", "ROM", "SSD", "Flashdisk"], a: 0 },
+      { q: "7. Istilah Machine Learning berarti...", o: ["Mesin yang dapat belajar dari data", "Komputer yang dirakit otomatis", "Program yang ditulis mesin", "Robot berbentuk manusia"], a: 0 },
+      { q: "8. Contoh penerapan Computer Vision adalah...", o: ["Pengenalan Wajah (Face Recognition)", "Text to Speech", "Kalkulator", "Pencarian Google"], a: 0 },
+      { q: "9. Sistem operasi open-source berlogo pinguin adalah...", o: ["Linux", "Windows", "macOS", "Android"], a: 0 },
+      { q: "10. Protokol aman untuk mengakses halaman web adalah...", o: ["HTTPS", "HTTP", "FTP", "SMTP"], a: 0 },
+      { q: "11. Struktur data berbasis baris dan kolom seperti tabel diproses menggunakan...", o: ["SQL / Database Relasional", "JSON", "HTML", "TXT"], a: 0 },
+      { q: "12. Pengolah grafis yang digunakan khusus untuk rendering gambar dan AI adalah...", o: ["GPU", "CPU", "PSU", "Sound Card"], a: 0 },
+      { q: "13. Istilah 'Cloud Computing' berarti...", o: ["Layanan komputasi via internet", "Komputer berbasis awan", "Sistem pendingin server", "Koneksi nirkabel"], a: 0 },
+      { q: "14. Jaringan saraf tiruan pada AI terinspirasi dari...", o: ["Otak manusia", "Jaringan telepon", "Sistem tata surya", "Rantai makanan"], a: 0 },
+      { q: "15. Apa kepanjangan dari IoT?", o: ["Internet of Things", "Integration of Technology", "Information of Telecom", "Internal Online Task"], a: 0 },
+      { q: "16. Teknologi untuk merekam transaksi secara terdesentralisasi dan aman adalah...", o: ["Blockchain", "Big Data", "Cyber Security", "Virtual Reality"], a: 0 },
+      { q: "17. Istilah 'Prompt' pada Generative AI berarti...", o: ["Teks instruksi yang diberikan ke AI", "Kecepatan respon AI", "Hasil keluaran gambar", "Bahasa pemrograman AI"], a: 0 },
+      { q: "18. Manakah yang termasuk Generative AI pembuat gambar?", o: ["Midjourney", "ChatGPT", "Claude", "Whisper"], a: 0 },
+      { q: "19. Ancaman kejahatan cyber dengan menyamar sebagai pihak tepercaya disebut...", o: ["Phishing", "DDoS", "Malware", "Ransomware"], a: 0 },
+      { q: "20. Software jahat yang mengunci data dan meminta tebusan disebut...", o: ["Ransomware", "Spyware", "Adware", "Trojan"], a: 0 },
+      { q: "21. Satuan data terkecil dalam komputasi adalah...", o: ["Bit", "Byte", "Kilobyte", "Megabyte"], a: 0 },
+      { q: "22. 1 Byte terdiri dari berapa bit?", o: ["8 bit", "4 bit", "16 bit", "1024 bit"], a: 0 },
+      { q: "23. Apa fungsi utama dari Firewall?", o: ["Menyaring dan mengamankan lalu lintas jaringan", "Meningkatkan kecepatan internet", "Menghapus virus secara otomatis", "Menyimpan data cadangan"], a: 0 },
+      { q: "24. Bahasa markup untuk membuat struktur halaman web adalah...", o: ["HTML", "CSS", "JavaScript", "Python"], a: 0 },
+      { q: "25. Bahasa yang digunakan untuk mengatur tampilan/desain halaman web adalah...", o: ["CSS", "HTML", "SQL", "C++"], a: 0 },
+      { q: "26. Pemrograman interaktif pada halaman web ditangani oleh...", o: ["JavaScript", "HTML", "CSS", "SQL"], a: 0 },
+      { q: "27. Konsep menggabungkan dunia nyata dengan objek digital secara langsung disebut...", o: ["Augmented Reality (AR)", "Virtual Reality (VR)", "Mixed Reality (MR)", "Cybernetics"], a: 0 },
+      { q: "28. Perangkat VR menutupi mata pengguna secara penuh untuk menciptakan...", o: ["Lingkungan virtual interaktif", "Tampilan 2D biasa", "Sistem operasi baru", "Proyeksi holografik"], a: 0 },
+      { q: "29. Apa kepanjangan dari URL?", o: ["Uniform Resource Locator", "Universal Reference Link", "Unified Resource Line", "Universal Record Locator"], a: 0 },
+      { q: "30. Layanan penyimpanan awan milik Google adalah...", o: ["Google Drive", "OneDrive", "Dropbox", "iCloud"], a: 0 },
+      { q: "31. Istilah 'Big Data' merujuk pada...", o: ["Volume data yang sangat besar dan kompleks", "File dengan ukuran terkompresi", "Harddisk berkapasitas tinggi", "Jaringan server terpusat"], a: 0 },
+      { q: "32. Model pembelajaran AI yang membutuhkan data berlabel disebut...", o: ["Supervised Learning", "Unsupervised Learning", "Reinforcement Learning", "Deep Learning"], a: 0 },
+      { q: "33. Pembelajaran AI berbasis sistem reward (hadiah) & hukuman disebut...", o: ["Reinforcement Learning", "Supervised Learning", "Semi-supervised", "Clustering"], a: 0 },
+      { q: "34. Teknologi yang memungkinkan mobil berjalan sendiri tanpa pengemudi memanfaatkan...", o: ["Autonomous Driving AI", "GPS Biasa", "Remote Control", "Sistem Radar Sederhana"], a: 0 },
+      { q: "35. Alat untuk menguji apakah manusia dapat membedakan interaksi AI vs Manusia adalah...", o: ["Turing Test", "Benchmarking", "Stress Test", "Beta Test"], a: 0 },
+      { q: "36. Perangkat keras penyimpan data permanen tanpa komponen bergerak adalah...", o: ["SSD", "HDD", "CD-ROM", "Disket"], a: 0 },
+      { q: "37. Protokol pengiriman email yang umum digunakan adalah...", o: ["SMTP", "HTTP", "FTP", "DNS"], a: 0 },
+      { q: "38. Layanan sistem penerjemah nama domain menjadi alamat IP dinamakan...", o: ["DNS", "DHCP", "VPN", "NAT"], a: 0 },
+      { q: "39. Teknologi jaringan seluler generasi ke-5 adalah...", o: ["5G", "4G LTE", "Wi-Fi 6", "Bluetooth 5"], a: 0 },
+      { q: "40. Istilah 'Open Source' berarti...", o: ["Kode sumber terbuka dan bebas dimodifikasi", "Aplikasi gratis tanpa fitur lengkap", "Perangkat lunak buatan pemerintah", "Sistem tanpa keamanan"], a: 0 },
+      { q: "41. Pendiri Microsoft yang terkenal adalah...", o: ["Bill Gates", "Steve Jobs", "Mark Zuckerberg", "Elon Musk"], a: 0 },
+      { q: "42. Pendiri Apple Inc. yang mempopulerkan iPhone adalah...", o: ["Steve Jobs", "Bill Gates", "Larry Page", "Jeff Bezos"], a: 0 },
+      { q: "43. Perusahaan pengembang model AI Gemini adalah...", o: ["Google", "OpenAI", "Microsoft", "Meta"], a: 0 },
+      { q: "44. Tempat penyimpanan repositori kode terbesar untuk developer adalah...", o: ["GitHub", "StackOverflow", "Medium", "LinkedIn"], a: 0 },
+      { q: "45. Istilah 'Bug' dalam dunia pemrograman merujuk pada...", o: ["Kesalahan atau cacat pada kode program", "Virus komputer", "Perangkat keras rusak", "Koneksi lambat"], a: 0 }
+    ];
+
+    let currentIdx = 0;
+    let userAnswers = new Array(questions.length).fill(null);
+
+    function startQuiz() {
+      currentIdx = 0;
+      userAnswers.fill(null);
+      showScreen('quiz-screen');
+      renderQuestion();
+    }
+
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    function renderQuestion() {
+      const q = questions[currentIdx];
+      document.getElementById('question-count').innerText = `Soal ${currentIdx + 1} / ${questions.length}`;
+      document.getElementById('question-text').innerText = q.q;
+      
+      const optionsContainer = document.getElementById('options-container');
+      optionsContainer.innerHTML = '';
+
+      q.o.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn' + (userAnswers[currentIdx] === idx ? ' selected' : '');
+        btn.innerText = `${String.fromCharCode(65 + idx)}. ${opt}`;
+        btn.onclick = () => selectOption(idx);
+        optionsContainer.appendChild(btn);
+      });
+
+      // Update progress
+      const progress = ((currentIdx + 1) / questions.length) * 100;
+      document.getElementById('progress-bar').style.width = `${progress}%`;
+
+      // Update Nav Buttons
+      document.getElementById('prev-btn').style.display = currentIdx > 0 ? 'block' : 'none';
+      document.getElementById('next-btn').innerText = currentIdx === questions.length - 1 ? 'Selesai' : 'Selanjutnya';
+    }
+
+    function selectOption(idx) {
+      userAnswers[currentIdx] = idx;
+      renderQuestion();
+      
+      // Hitung skor sementara
+      let tempScore = 0;
+      userAnswers.forEach((ans, i) => {
+        if(ans === questions[i].a) tempScore++;
+      });
+      document.getElementById('score-live').innerText = `Skor: ${tempScore}`;
+    }
+
+    function prevQuestion() {
+      if (currentIdx > 0) {
+        currentIdx--;
+        renderQuestion();
+      }
+    }
+
+    function nextQuestion() {
+      if (currentIdx < questions.length - 1) {
+        currentIdx++;
+        renderQuestion();
+      } else {
+        finishQuiz();
+      }
+    }
+
+    function finishQuiz() {
+      let correct = 0;
+      userAnswers.forEach((ans, i) => {
+        if(ans === questions[i].a) correct++;
+      });
+
+      const percentage = Math.round((correct / questions.length) * 100);
+      document.getElementById('score-circle').innerText = `${percentage}%`;
+      document.getElementById('correct-count').innerText = correct;
+      document.getElementById('wrong-count').innerText = questions.length - correct;
+
+      showScreen('result-screen');
+    }
+  </script>
+</body>
+</html>
